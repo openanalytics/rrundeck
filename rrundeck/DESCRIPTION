@@ -1,0 +1,13 @@
+Package: rrundeck
+Type: Package
+Version: 0.1.0
+Date: 2019-07-07
+Title: rrundeck
+Author: Daan Seynaeve
+Maintainer: Daan Seynaeve <daan.seynaeve@openanalytics.eu>
+Description: R Client for the Rundeck API
+License: MIT
+Imports: httr, jsonlite, curl
+RoxygenNote: 6.1.1
+Suggests: 
+    testthat
