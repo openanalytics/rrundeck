@@ -77,7 +77,7 @@ getExecutionLog <- function(
   }
   
   if (verbose) {
-    cat(sprintf("Duration:\t%f ms\n", output$execDuration))
+    cat(sprintf("Duration:\t%.0f ms\n", output$execDuration))
     cat(sprintf("Status:\t\t%s\n", output$execState))
   }
   

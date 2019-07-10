@@ -72,11 +72,13 @@ rundeckGET <- function(rundeck, path, ...) {
 #' @export
 rundeckPOST <- function(rundeck, path, body, ...) {
   
-  json <- toJSON(body)
+  json <- toJSON(body, auto_unbox = TRUE)
+  
+  url <- modify_url(rundeck$host, 
+      path = c(rundeck$contextPath, "api", rundeck$version, path))
   
   response <- POST(
-      url = modify_url(rundeck$host, 
-          path = c(rundeck$contextPath, "api", rundeck$version, path)),
+      url = url,
       body = json,
       content_type_json(),
       add_headers("X-Rundeck-Auth-Token" = rundeck$token),
@@ -144,7 +146,7 @@ createProject <- function(
     ...) {
   
   rundeckPOST(rundeck,
-      path = c("projects"),
+      path = c(rundeck$contextPath, "projects"),
       body = list(name = unbox(name), config = config),
       ...)
   
