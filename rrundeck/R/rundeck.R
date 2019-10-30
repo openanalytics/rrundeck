@@ -7,7 +7,7 @@
 #' @import httr
 #' @export
 rundeck <- function(url = "http://localhost", version = 31, user = NULL,
-    token = NULL) {
+    token = NULL, contextPath = c()) {
   
   if (!any(parse_url(url)$scheme == c("https", "http"))) {
     warning("Unsupported scheme")
@@ -18,6 +18,7 @@ rundeck <- function(url = "http://localhost", version = 31, user = NULL,
   structure(
       list(host = url,
           user = user,
+          contextPath = contextPath,
           version = version,
           token = token),
       class = c("Rundeck", "list"))
@@ -30,6 +31,14 @@ requireAPIVersion <- function(rundeck, min) {
   }
 }
 
+#' @param ... further arguments; not used
+#' @export
+print.Rundeck <- function(x, ...) {
+  
+  cat(sprintf("<rundeck server with url: %s>\n", x$host))
+  
+}
+
 #' Rundeck GET API Request
 #' @description Execute a GET API request against Rundeck
 #' @param rundeck see \code{\link{rundeck}}
@@ -38,9 +47,11 @@ requireAPIVersion <- function(rundeck, min) {
 #' @export
 rundeckGET <- function(rundeck, path, ...) {
   
+  url = modify_url(rundeck$host, 
+      path = c(rundeck$contextPath, "api", rundeck$version, path))
+  
   response <- GET(
-      url = modify_url(rundeck$host,
-          path = c("api", rundeck$version, path)),
+      url,
       add_headers("X-Rundeck-Auth-Token" = rundeck$token),
       accept_json(),
       ...)
@@ -61,11 +72,13 @@ rundeckGET <- function(rundeck, path, ...) {
 #' @export
 rundeckPOST <- function(rundeck, path, body, ...) {
   
-  json <- toJSON(body)
+  json <- toJSON(body, auto_unbox = TRUE)
+  
+  url <- modify_url(rundeck$host, 
+      path = c(rundeck$contextPath, "api", rundeck$version, path))
   
   response <- POST(
-      url = modify_url(rundeck$host,
-          path = c("api", rundeck$version, path)),
+      url = url,
       body = json,
       content_type_json(),
       add_headers("X-Rundeck-Auth-Token" = rundeck$token),
@@ -85,8 +98,8 @@ rundeckPOST <- function(rundeck, path, body, ...) {
 #' @export
 rundeckHEAD <- function(rundeck, path, ...) {
   
-  url <- modify_url(rundeck$host,
-      path = c("api", rundeck$version, path))
+  url <- modify_url(rundeck$host, 
+      path = c(rundeck$contextPath, "api", rundeck$version, path))
   
   response <- HEAD(
       url = url,
@@ -133,7 +146,7 @@ createProject <- function(
     ...) {
   
   rundeckPOST(rundeck,
-      path = c("projects"),
+      path = c(rundeck$contextPath, "projects"),
       body = list(name = unbox(name), config = config),
       ...)
   

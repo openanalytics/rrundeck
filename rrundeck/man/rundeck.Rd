@@ -5,7 +5,7 @@
 \title{Connect to a Rundeck server}
 \usage{
 rundeck(url = "http://localhost", version = 31, user = NULL,
-  token = NULL)
+  token = NULL, contextPath = c())
 }
 \arguments{
 \item{url}{TODO}
